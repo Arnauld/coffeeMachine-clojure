@@ -11,11 +11,16 @@
 (Given #"^I've inserted (\d+(?:\.\d+)?)€ in the machine$" [amount]
       (reset! *money* (BigDecimal. amount)))
 
-(When #"^I order a '([^\']*)' with (\d+) sugar$" [drink nb-sugar-cubes]
-      (let [nb-sugar (Integer/parseInt nb-sugar-cubes)
-            order (core/create-order drink nb-sugar @*money*)
+(defn- process-order [drink nb-sugar]
+      (let [order (core/create-order drink nb-sugar @*money*)
             output (core/process order)]
           (reset! *output* output)))
+
+(When #"^I order a '([^\']*)' with (\d+) sugar$" [drink nb-sugar-cubes]
+      (process-order drink (Integer/parseInt nb-sugar-cubes)))
+
+(When #"^I order an? '([^\']*)'$" [drink]
+      (process-order drink 0))
 
 (When #"^the message '([^']*)' is sent$" [message]
       (let [output (core/process message)]
