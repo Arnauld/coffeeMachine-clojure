@@ -16,7 +16,7 @@
             output (core/process order)]
           (reset! *output* output)))
 
-(When #"^I order a '([^\']*)' with (\d+) sugar$" [drink nb-sugar-cubes]
+(When #"^I order an? '([^\']*)' with (\d+) sugar$" [drink nb-sugar-cubes]
       (process-order drink (Integer/parseInt nb-sugar-cubes)))
 
 (When #"^I order an? '([^\']*)'$" [drink]
