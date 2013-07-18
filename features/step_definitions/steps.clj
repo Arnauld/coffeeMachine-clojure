@@ -8,6 +8,10 @@
 (def actual-output (atom ""))
 (def actual-money (atom TWO))
 
+(Before []
+  (reset! actual-output "")
+  (reset! actual-money TWO))
+
 (Given #"^I've inserted (\d+(?:\.\d+)?)€ in the machine$" [amount]
       (reset! actual-money (BigDecimal. amount)))
 
@@ -16,7 +20,10 @@
             output (core/process order)]
           (reset! actual-output output)))
 
-(When #"^I order an?( extra hot)? '([^\']*)' with (\d+) sugar$" [extra-hot drink nb-sugar-cubes]
+(When #"^I order an? '([^\']*)' with (\d+) sugar$" [drink nb-sugar-cubes]
+      (process-order drink (Integer/parseInt nb-sugar-cubes)))
+
+(When #"^I order an extra hot '([^\']*)' with (\d+) sugar$" [drink nb-sugar-cubes]
       (process-order drink (Integer/parseInt nb-sugar-cubes)))
 
 (When #"^I order an? '([^\']*)'$" [drink]

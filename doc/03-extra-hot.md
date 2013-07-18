@@ -17,3 +17,13 @@ You can implement missing steps with the snippets below:
   (comment  Express the Regexp above with the code you wish you had  )
   (throw (cucumber.runtime.PendingException.)))
 ```
+
+
+
+Forgot to reset state between tests
+
+```clojure
+(Before []
+  (reset! actual-output "")
+  (reset! actual-money TWO))
+```

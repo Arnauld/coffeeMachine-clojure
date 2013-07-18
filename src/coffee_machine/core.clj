@@ -35,7 +35,9 @@
      (let [drink (:drink order)
            missing (missing-money order drink)]
         (if (< 0 (.compareTo missing ZERO))
-            (process (str "Not enough money " missing " missing"))
+            (do 
+              ;(println "missing money (" (:money order) " vs " (:price (:drink order)) ")")
+              (process (str "Not enough money " missing " missing")))
             ; else
             (let [drink-part (:protocol-part drink)
                   nb-sugar   (:nb-sugar order)
