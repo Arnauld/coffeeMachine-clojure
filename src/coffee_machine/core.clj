@@ -7,7 +7,8 @@
 
 (def all-drinks [(->Drink "Tea" "T" (BigDecimal. "0.4"))
                  (->Drink "Coffee" "C" (BigDecimal. "0.5"))
-                 (->Drink "Chocolate" "H" (BigDecimal. "0.6"))])
+                 (->Drink "Chocolate" "H" (BigDecimal. "0.6"))
+                 (->Drink "Orange Juice" "O" (BigDecimal. "0.6"))])
 
 (defn drink-by-label [label]
   (let [found (some #(if (.equalsIgnoreCase (:label %) label) %) all-drinks)]
