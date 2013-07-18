@@ -8,7 +8,7 @@ Feature files are directly copied from the similar java project [coffeeMachine-j
 
 ## Usage
 
-FIXME
+    lein cucumber
 
 ## License
 

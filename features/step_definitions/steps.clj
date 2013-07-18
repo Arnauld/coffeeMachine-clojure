@@ -16,3 +16,6 @@
 (Then #"^the instruction generated should be '([^']*)'$" [expected-output]
   (is (= expected-output @*output*)))
 
+(Given #"^I've inserted (\d+(?:\.\d+)?)€ in the machine$" [arg1]
+  (comment  Express the Regexp above with the code you wish you had  )
+  (throw (cucumber.runtime.PendingException.)))
