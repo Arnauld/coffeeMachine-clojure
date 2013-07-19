@@ -15,19 +15,19 @@
 (Given #"^I've inserted (\d+(?:\.\d+)?)€ in the machine$" [amount]
       (reset! actual-money (BigDecimal. amount)))
 
-(defn- process-order [drink nb-sugar]
-      (let [order (core/create-order drink nb-sugar @actual-money)
+(defn- process-order [drink nb-sugar very-hot]
+      (let [order (core/create-order drink nb-sugar @actual-money very-hot)
             output (core/process order)]
           (reset! actual-output output)))
 
 (When #"^I order an? '([^\']*)' with (\d+) sugar$" [drink nb-sugar-cubes]
-      (process-order drink (Integer/parseInt nb-sugar-cubes)))
+      (process-order drink (Integer/parseInt nb-sugar-cubes) false))
 
 (When #"^I order an extra hot '([^\']*)' with (\d+) sugar$" [drink nb-sugar-cubes]
-      (process-order drink (Integer/parseInt nb-sugar-cubes)))
+      (process-order drink (Integer/parseInt nb-sugar-cubes) true))
 
 (When #"^I order an? '([^\']*)'$" [drink]
-      (process-order drink 0))
+      (process-order drink 0 false))
 
 (When #"^the message '([^']*)' is sent$" [message]
       (let [output (core/process message)]
