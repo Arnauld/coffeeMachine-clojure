@@ -6,11 +6,14 @@
 (def TWO (BigDecimal. "2"))
 
 (def actual-output (atom ""))
+(def actual-stats (atom ""))
 (def actual-money (atom TWO))
 
 (Before []
   (reset! actual-output "")
-  (reset! actual-money TWO))
+  (reset! actual-stats "")
+  (reset! actual-money TWO)
+  (core/reset-stats))
 
 (Given #"^I've inserted (\d+(?:\.\d+)?)€ in the machine$" [amount]
       (reset! actual-money (BigDecimal. amount)))
@@ -54,10 +57,8 @@
         (process-order raw-drink 0 false money))))
 
 (When #"^I query for a report$" []
-  (comment  Express the Regexp above with the code you wish you had  )
-  (throw (cucumber.runtime.PendingException.)))
+      (reset! actual-stats (core/stats-snapshot)))
 
-(Then #"^the report output should be$" [report-string]
-  (comment  Express the Regexp above with the code you wish you had  )
-  (throw (cucumber.runtime.PendingException.)))
+(Then #"^the report output should be$" [expected-stats]
+      (is (= expected-stats @actual-stats)))
 
