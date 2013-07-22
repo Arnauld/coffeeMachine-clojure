@@ -5,6 +5,10 @@
 (defrecord Order [drink nb-sugar money very-hot])
 (defprotocol Processor (process [processable]))
 
+;;
+;; Drinks: ALL + Helpers
+;;
+
 (defn accept-sugar [sugar] sugar)
 (defn no-sugar     [sugar] 0)
 (defn not-hot      [hot] false)
@@ -30,6 +34,25 @@
         ; else
         found)))
 
+;;
+;; "Dependency Injection" : EmailNotifier and BeverageQuantityChecker
+;;
+
+(declare ^:dynamic *email-notifier*)
+(defmacro with-email-notifier [notifier & body]
+  `(binding [*email-notifier* (atom ~notifier)]
+      (do ~@body)))
+
+
+(declare ^:dynamic *beverage-quantity-checker*)
+(defmacro with-beverage-quantity-checker [checker & body]
+  `(binding [*beverage-quantity-checker* (atom ~checker)]
+      (do ~@body)))
+
+
+;;
+;; Protocol Helpers
+;;
 
 (defn- adapted-sugar [order]
   (let [sugar (:nb-sugar order)
@@ -52,6 +75,10 @@
         drink (:drink order)]
     (str (:protocol-part drink) (if hot "h" ""))))
 
+;;
+;; Create Order
+;;
+
 (defn create-order 
   ([drink-label nb-sugar money] 
     (create-order drink-label nb-sugar money false))
@@ -67,6 +94,9 @@
         price (:price drink)]
       (.subtract price money)))
 
+;;
+;; STATS
+;;
 
 (def stats (atom {:total ZERO}))
 
@@ -85,7 +115,6 @@
            key 
            (if-let [n (m key)] (+ n amount) amount))))
 
-
 (def money-formatter 
   (let [nf (java.text.NumberFormat/getInstance java.util.Locale/US)]
     (.setMaximumFractionDigits nf 2)
@@ -94,7 +123,6 @@
 
 (defn format-money [amount]
   (.format money-formatter amount))
-
 
 (defn update-stats [order]
   (let [drink (:drink order)]

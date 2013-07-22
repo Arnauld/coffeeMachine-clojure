@@ -2,18 +2,25 @@
 (require '[coffee-machine.core :as core])
 (import java.math.BigDecimal)
 
-
 (def TWO (BigDecimal. "2"))
 
 (def actual-output (atom ""))
 (def actual-stats (atom ""))
 (def actual-money (atom TWO))
 
+;;
+;; Reset all "global" states before each scenario
+;;
+
 (Before []
   (reset! actual-output "")
   (reset! actual-stats "")
   (reset! actual-money TWO)
   (core/reset-stats))
+
+;;
+;;
+;;
 
 (Given #"^I've inserted (\d+(?:\.\d+)?)€ in the machine$" [amount]
       (reset! actual-money (BigDecimal. amount)))
@@ -61,4 +68,16 @@
 
 (Then #"^the report output should be$" [expected-stats]
       (is (= expected-stats @actual-stats)))
+
+;;
+;;
+;;
+
+(Given #"^no more '([^']*)' remaining in the machine$" [drink]
+  (comment  Express the Regexp above with the code you wish you had  )
+  (throw (cucumber.runtime.PendingException.)))
+
+(Then #"^a mail should have been sent indicating '([^']*)' is running out$" [drink]
+  (comment  Express the Regexp above with the code you wish you had  )
+  (throw (cucumber.runtime.PendingException.)))
 
