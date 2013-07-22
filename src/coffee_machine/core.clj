@@ -3,7 +3,6 @@
 
 (defrecord Drink [kw label protocol-part price sugar-adapter hot-adapter])
 (defrecord Order [drink nb-sugar money very-hot])
-(defprotocol Processor (process [processable]))
 
 ;;
 ;; Drinks: ALL + Helpers
@@ -33,22 +32,6 @@
         (throw (IllegalArgumentException. (str "Drink unknown: '" kw "'")))
         ; else
         found)))
-
-;;
-;; "Dependency Injection" : EmailNotifier and BeverageQuantityChecker
-;;
-
-(declare ^:dynamic *email-notifier*)
-(defmacro with-email-notifier [notifier & body]
-  `(binding [*email-notifier* (atom ~notifier)]
-      (do ~@body)))
-
-
-(declare ^:dynamic *beverage-quantity-checker*)
-(defmacro with-beverage-quantity-checker [checker & body]
-  `(binding [*beverage-quantity-checker* (atom ~checker)]
-      (do ~@body)))
-
 
 ;;
 ;; Protocol Helpers
@@ -144,21 +127,23 @@
         formatted (reduce (stats-reducer stats) "" sorted-keys)]
       (str formatted "---\nTotal: " (format-money (:total stats)) "€")))
 
-(extend-protocol Processor
-  Order
-  (process [order]
+(defn process-message [message]
+     (str "M:" message))
+
+
+(defn process-order [order 
+                     beverage-quantity-checker 
+                     missing-drink-notifier]
      (let [missing (missing-money order)]
         (if (< 0 (.compareTo missing ZERO))
             (do 
               ;(println "missing money (" (:money order) " vs " (:price (:drink order)) ")")
-              (process (str "Not enough money " missing " missing")))
+              (process-message (str "Not enough money " missing " missing")))
             ; else
             (let [drink-part (drink-protocol-part order)
                   sugar-part (sugar-protocol-part order)]
                 (update-stats order)
                 (str drink-part ":" sugar-part)))))
-  String
-  (process [message]
-     (str "M:" message)))
+
 
 

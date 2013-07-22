@@ -1,12 +1,29 @@
 (use 'clojure.test)
 (require '[coffee-machine.core :as core])
 (import java.math.BigDecimal)
+(import coffeemachine.EmailNotifier)
+(require '[conjure.core])
 
 (def TWO (BigDecimal. "2"))
+(defn IDENTITY [x] x)
+(defn in? 
+  "true if seq contains elm"
+  [seq elm]  
+  (some #(= elm %) seq))
 
 (def actual-output (atom ""))
 (def actual-stats (atom ""))
 (def actual-money (atom TWO))
+(def emails-sent (atom []))
+(def missing-beverages (atom []))
+
+;;
+
+(defn beverage-quantity-checker [drink]
+  (not (in? @missing-beverages (.toLowerCase drink))))
+
+(defn missing-drink-notifier [drink]
+  (swap! emails-sent conj drink))
 
 ;;
 ;; Reset all "global" states before each scenario
@@ -16,6 +33,8 @@
   (reset! actual-output "")
   (reset! actual-stats "")
   (reset! actual-money TWO)
+  (reset! emails-sent [])
+  (reset! missing-beverages [])
   (core/reset-stats))
 
 ;;
@@ -30,7 +49,9 @@
       (process-order drink nb-sugar very-hot @actual-money))
   ([drink nb-sugar very-hot money]
       (let [order (core/create-order drink nb-sugar money very-hot)
-            output (core/process order)]
+            output (core/process-order order 
+                                       beverage-quantity-checker 
+                                       missing-drink-notifier)]
           (reset! actual-output output))))
 
 (When #"^I order an? '([^\']*)' with (\d+) sugar$" [drink nb-sugar-cubes]
@@ -43,12 +64,13 @@
       (process-order drink 0 false))
 
 (When #"^the message '([^']*)' is sent$" [message]
-      (let [output (core/process message)]
+      (let [output (core/process-message message)]
           (reset! actual-output output)))
 
 (Then #"^the instruction generated should be '([^']*)'$" [expected-output]
   (is (= expected-output @actual-output)))
 
+;;
 ;;
 ;;
 
@@ -74,8 +96,7 @@
 ;;
 
 (Given #"^no more '([^']*)' remaining in the machine$" [drink]
-  (comment  Express the Regexp above with the code you wish you had  )
-  (throw (cucumber.runtime.PendingException.)))
+  (swap! missing-beverages conj (.toLowerCase drink)))
 
 (Then #"^a mail should have been sent indicating '([^']*)' is running out$" [drink]
   (comment  Express the Regexp above with the code you wish you had  )
