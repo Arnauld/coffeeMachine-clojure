@@ -134,16 +134,20 @@
 (defn process-order [order 
                      beverage-quantity-checker 
                      missing-drink-notifier]
-     (let [missing (missing-money order)]
+     (let [missing (missing-money order)
+           label   (:label (:drink order))]
         (if (< 0 (.compareTo missing ZERO))
             (do 
               ;(println "missing money (" (:money order) " vs " (:price (:drink order)) ")")
               (process-message (str "Not enough money " missing " missing")))
             ; else
-            (let [drink-part (drink-protocol-part order)
-                  sugar-part (sugar-protocol-part order)]
-                (update-stats order)
-                (str drink-part ":" sugar-part)))))
+            (if (beverage-quantity-checker label)
+              (let [drink-part (drink-protocol-part order)
+                    sugar-part (sugar-protocol-part order)]
+                  (update-stats order)
+                  (str drink-part ":" sugar-part))
+              ;else
+              (missing-drink-notifier label)))))
 
 
 

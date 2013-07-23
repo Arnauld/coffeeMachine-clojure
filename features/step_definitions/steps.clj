@@ -23,7 +23,7 @@
   (not (in? @missing-beverages (.toLowerCase drink))))
 
 (defn missing-drink-notifier [drink]
-  (swap! emails-sent conj drink))
+  (swap! emails-sent conj (.toLowerCase drink)))
 
 ;;
 ;; Reset all "global" states before each scenario
@@ -99,6 +99,5 @@
   (swap! missing-beverages conj (.toLowerCase drink)))
 
 (Then #"^a mail should have been sent indicating '([^']*)' is running out$" [drink]
-  (comment  Express the Regexp above with the code you wish you had  )
-  (throw (cucumber.runtime.PendingException.)))
+  (is (in? @emails-sent (.toLowerCase drink))))
 
