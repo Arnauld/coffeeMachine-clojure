@@ -4,4 +4,11 @@
 
 (deftest a-test
   (testing "FIXME, I fail."
-    (is (= 0 1))))
+    (is (= 1 1))))
+
+
+(deftest drink-by-label-test
+  (testing "FIXME, I fail."
+    (is (thrown? IllegalArgumentException (drink-by-label "chocolator")))
+    (is (= :chocolate (:kw (drink-by-label "chocolate"))))
+    (is (= :chocolate (:kw (drink-by-label "chOcOlAtE"))))))

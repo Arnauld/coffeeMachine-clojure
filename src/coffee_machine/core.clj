@@ -18,20 +18,19 @@
                  (->Drink :chocolate "Chocolate" "H" (BigDecimal. "0.6") accept-sugar accept-hot)
                  (->Drink :orange    "Orange Juice" "O" (BigDecimal. "0.6") no-sugar not-hot)])
 
-;; TODO refactor drink-or-fail + filter by-label & by-keyword
+(defn drink-or-fail [selector detail]
+  (let [found (some selector all-drinks)]
+  (if (nil? found) 
+      (throw (IllegalArgumentException. (str "Drink unknown: '" detail "'")))
+      ; else
+      found)))
+
 (defn drink-by-label [label]
-  (let [found (some #(if (.equalsIgnoreCase (:label %) label) %) all-drinks)]
-    (if (nil? found) 
-        (throw (IllegalArgumentException. (str "Drink unknown: '" label "'")))
-        ; else
-        found)))
+  (drink-or-fail #(if (.equalsIgnoreCase (:label %) label) %) label))
 
 (defn drink-by-keword [kw]
-  (let [found (some #(if (= (:kw %) kw) %) all-drinks)]
-    (if (nil? found) 
-        (throw (IllegalArgumentException. (str "Drink unknown: '" kw "'")))
-        ; else
-        found)))
+  (drink-or-fail #(if (= (:kw %) kw) %) kw))
+
 
 ;;
 ;; Protocol Helpers
